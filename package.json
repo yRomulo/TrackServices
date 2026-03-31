@@ -1,0 +1,15 @@
+{
+  "name": "track-services-monorepo",
+  "private": true,
+  "packageManager": "npm@10.8.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev -w apps/frontend",
+    "build:frontend": "npm run build -w apps/frontend",
+    "start:frontend": "npm run start -w apps/frontend",
+    "lint:frontend": "npm run lint -w apps/frontend"
+  }
+}

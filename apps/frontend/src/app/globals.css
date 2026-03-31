@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --header-offset: 76px;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --header-offset: 106px;
+  }
+}
+
+#home,
+#sobre,
+#servicos,
+#cases,
+#nums,
+#portal,
+#trabalhe,
+#contato {
+  scroll-margin-top: var(--header-offset);
+}
+
+body {
+  @apply bg-white text-slate-700;
+}
+
+.section-title {
+  @apply font-condensed text-3xl font-extrabold tracking-tight text-slate-900 md:text-5xl;
+}
+
+.section-label {
+  @apply mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-brand-orange;
+}
+
+.section-label::before {
+  content: "";
+  @apply h-0.5 w-8 rounded bg-brand-orange;
+}
+
+.marquee {
+  animation: marquee 22s linear infinite;
+}
+
+.marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.fd {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.fd.wl {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.fd.wl.in {
+  opacity: 1;
+  transform: translateY(0);
+}
