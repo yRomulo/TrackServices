@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { buildMailtoUrl, trackServicesContact } from "@/components/sections/contactData";
+import { buildMailtoUrl, trackServicesContact } from "@/data/contactData";
 
 type PortalAccessRequest = {
   name: string;

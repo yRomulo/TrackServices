@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Barlow, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
-import { trackServicesContact } from "@/components/sections/contactData";
+import { Footer } from "@/components/Footer";
+import { trackServicesContact } from "@/data/contactData";
+import { SiteHeader } from "@/components/SiteHeader";
 
 const barlow = Barlow({
   subsets: ["latin"],
@@ -97,7 +99,11 @@ export default function RootLayout({
           Pular para o conteúdo
         </a>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-        {children}
+        <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
+          <SiteHeader />
+          <div className="flex-1">{children}</div>
+          <Footer />
+        </div>
       </body>
     </html>
   );

@@ -1,5 +1,5 @@
-import { TrackLanding } from "@/components/TrackLanding";
+import { HomePage } from "./home/page";
 
 export default function Home() {
-  return <TrackLanding />;
+  return <HomePage />;
 }

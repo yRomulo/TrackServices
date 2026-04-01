@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { buildContactMessage, buildMailtoUrl, buildWhatsAppUrl, trackServicesContact } from "@/components/sections/contactData";
+import { buildContactMessage, buildMailtoUrl, buildWhatsAppUrl, trackServicesContact } from "@/data/contactData";
 
 type ContactFormState = {
   name: string;

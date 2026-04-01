@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { buildWhatsAppUrl, trackServicesContact } from "@/components/sections/contactData";
+import { buildWhatsAppUrl, trackServicesContact } from "@/data/contactData";
 
 type CareersSectionProps = {
   arrowIcon: ReactNode;

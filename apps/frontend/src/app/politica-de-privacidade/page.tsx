@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { trackServicesContact } from "@/components/sections/contactData";
+import { trackServicesContact } from "@/data/contactData";
 
 export const metadata: Metadata = {
   title: "Política de Privacidade",
@@ -28,7 +28,7 @@ const topics = [
 
 export default function PrivacyPolicyPage() {
   return (
-    <main className="bg-slate-50 py-16">
+    <main id="content" className="bg-slate-50 py-16">
       <div className="mx-auto w-full max-w-4xl px-[5%]">
         <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-[#E8621A]">LGPD e Privacidade</p>
         <h1 className="font-[var(--font-barlow-condensed)] text-4xl font-extrabold tracking-tight text-slate-900 md:text-5xl">
