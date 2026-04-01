@@ -1,6 +1,11 @@
+import type { ReactNode } from "react";
+import { buildWhatsAppUrl, trackServicesContact } from "@/components/sections/contactData";
+
 type CareersSectionProps = {
-  arrowIcon: React.ReactNode;
+  arrowIcon: ReactNode;
 };
+
+const careersMessage = "Olá, gostaria de enviar meu currículo e participar do processo seletivo da Track Services.";
 
 export function CareersSection({ arrowIcon }: CareersSectionProps) {
   return (
@@ -11,7 +16,15 @@ export function CareersSection({ arrowIcon }: CareersSectionProps) {
           <h2 className="font-[var(--font-barlow-condensed)] text-4xl font-extrabold tracking-tight text-slate-900 md:text-5xl">Faça parte do nosso time</h2>
           <span className="my-5 block h-1 w-12 rounded bg-[#E8621A]" />
           <p className="text-slate-600">A Track Services está sempre em busca de profissionais apaixonados por tecnologia.</p>
-          <a href="https://api.whatsapp.com/send?phone=5522997321619" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex min-h-[46px] items-center gap-2 rounded bg-[#E8621A] px-6 text-sm font-bold uppercase tracking-[0.05em] text-white shadow-md transition hover:-translate-y-0.5 hover:bg-[#C04E10]">Enviar currículo pelo WhatsApp {arrowIcon}</a>
+          <a
+            href={buildWhatsAppUrl(trackServicesContact.careersWhatsApp.phone, careersMessage)}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Enviar currículo pelo WhatsApp"
+            className="mt-6 inline-flex min-h-[46px] items-center gap-2 rounded bg-[#E8621A] px-6 text-sm font-bold uppercase tracking-[0.05em] text-white shadow-md transition hover:-translate-y-0.5 hover:bg-[#C04E10]"
+          >
+            Enviar currículo pelo WhatsApp {arrowIcon}
+          </a>
         </div>
         <div className="fd space-y-3">
           {[
