@@ -7,6 +7,30 @@ export type ContactLead = {
   message: string;
 };
 
+export const contactServiceOptions = [
+  "Gestão de TIC",
+  "Consultoria de TIC",
+  "Outsourcing de TI",
+  "Projetos de Infraestrutura",
+  "Data Center e Servidores",
+  "Suporte Técnico",
+  "NOC 24/7",
+  "CFTV",
+  "Controle de Acesso",
+  "Assistência Técnica",
+  "Venda de Equipamentos",
+  "Outro"
+] as const;
+
+export type ContactServiceOption = (typeof contactServiceOptions)[number];
+
+export type CommercialContactChannel = "whatsapp" | "email";
+
+export type CommercialContactSubmission = ContactLead & {
+  preferredChannel?: CommercialContactChannel;
+  website?: string;
+};
+
 export const trackServicesContact = {
   generalPhone: {
     display: "(22) 3324-4773",
@@ -22,7 +46,7 @@ export const trackServicesContact = {
     phone: "5522997321619",
     href: "https://wa.me/5522997321619"
   },
-  email: "comercial@trackservices.com.br",
+  email: "romulo.marroso@gmail.com",
   website: "https://trackservices.com.br",
   social: {
     instagram: "https://www.instagram.com/trackservices",
@@ -49,4 +73,17 @@ export function buildContactMessage(lead: ContactLead) {
     `Serviço de interesse: ${lead.service || "Não informado"}`,
     `Mensagem: ${lead.message || "Não informado"}`
   ].join("\n");
+}
+
+export function buildCommercialContactSubject(lead: Pick<ContactLead, "name" | "company">) {
+  return `Novo contato do site - ${lead.company || lead.name || "Track Services"}`;
+}
+
+export function buildCommercialContactLinks(lead: ContactLead) {
+  const message = buildContactMessage(lead);
+
+  return {
+    whatsappUrl: buildWhatsAppUrl(trackServicesContact.commercialWhatsApp.phone, message),
+    emailUrl: buildMailtoUrl(buildCommercialContactSubject(lead), message)
+  };
 }

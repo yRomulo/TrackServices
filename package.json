@@ -10,6 +10,9 @@
     "dev:frontend": "npm run dev -w apps/frontend",
     "build:frontend": "npm run build -w apps/frontend",
     "start:frontend": "npm run start -w apps/frontend",
-    "lint:frontend": "npm run lint -w apps/frontend"
+    "lint:frontend": "npm run lint -w apps/frontend",
+    "dev:backend": "dotnet watch --project apps/backend/src/TrackServices.Api/TrackServices.Api.csproj",
+    "build:backend": "dotnet build apps/backend/TrackServices.Backend.sln",
+    "start:backend": "dotnet run --project apps/backend/src/TrackServices.Api/TrackServices.Api.csproj"
   }
 }

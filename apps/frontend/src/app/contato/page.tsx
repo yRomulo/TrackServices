@@ -13,14 +13,14 @@ export default function ContatoPage() {
       <PageHeroSection
         eyebrow="Contato"
         title="Fale com a Track Services"
-        description="A página de contato existe para fechar a conversa comercial de forma objetiva. O formulário já encaminha a solicitação para WhatsApp ou e-mail com contexto suficiente para resposta rápida."
+        description="A página de contato existe para fechar a conversa comercial de forma objetiva. O formulário registra a solicitação e oferece os próximos passos em WhatsApp ou e-mail com contexto suficiente para resposta rápida."
         highlights={[
           "WhatsApp comercial",
           "Diagnóstico gratuito",
           "Resposta orientada ao escopo",
           "Atendimento no RJ"
         ]}
-        primaryAction={{ label: "Enviar WhatsApp", href: "/contato#contato" }}
+        primaryAction={{ label: "Ir para o formulário", href: "/contato#contato" }}
         secondaryAction={{ label: "Ver serviços", href: "/servicos" }}
       />
 

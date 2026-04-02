@@ -5,3 +5,10 @@ dist
 coverage
 .env*
 !.env.example
+**/bin/
+**/obj/
+**/.vs/
+*.user
+*.suo
+*.csproj.user
+*.sln.docstates

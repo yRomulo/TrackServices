@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { buildContactMessage, buildMailtoUrl, buildWhatsAppUrl, trackServicesContact } from "@/data/contactData";
+import emailjs from "@emailjs/browser";
+import {
+  buildCommercialContactLinks,
+  contactServiceOptions,
+  trackServicesContact
+} from "@/data/contactData";
 
 type ContactFormState = {
   name: string;
@@ -9,6 +14,17 @@ type ContactFormState = {
   email: string;
   phone: string;
   service: string;
+  message: string;
+  website: string;
+};
+
+type FollowUpLinks = {
+  whatsappUrl: string;
+  emailUrl: string;
+};
+
+type ValidationIssue = {
+  field: keyof Omit<ContactFormState, "website">;
   message: string;
 };
 
@@ -18,48 +34,126 @@ const initialFormState: ContactFormState = {
   email: "",
   phone: "",
   service: "",
-  message: ""
+  message: "",
+  website: ""
 };
 
-const serviceOptions = [
-  "Gestão de TIC",
-  "Consultoria de TIC",
-  "Outsourcing de TI",
-  "Projetos de Infraestrutura",
-  "Data Center e Servidores",
-  "Suporte Técnico",
-  "NOC 24/7",
-  "CFTV",
-  "Controle de Acesso",
-  "Assistência Técnica",
-  "Venda de Equipamentos",
-  "Outro"
-];
+const emailJsConfig = {
+  serviceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID?.trim() ?? "",
+  templateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID?.trim() ?? "",
+  publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY?.trim() ?? ""
+} as const;
+
+function validateContactLead(formData: ContactFormState): ValidationIssue | null {
+  if (!formData.name.trim() || formData.name.trim().length < 2 || formData.name.trim().length > 120) {
+    return { field: "name", message: "Informe um nome válido." };
+  }
+
+  if (!formData.company.trim() || formData.company.trim().length < 2 || formData.company.trim().length > 120) {
+    return { field: "company", message: "Informe a empresa." };
+  }
+
+  if (!/^\S+@\S+\.\S+$/.test(formData.email.trim()) || formData.email.trim().length > 254) {
+    return { field: "email", message: "Informe um e-mail corporativo válido." };
+  }
+
+  const phoneDigits = formData.phone.replace(/\D/g, "");
+  if (phoneDigits.length < 8 || phoneDigits.length > 20) {
+    return { field: "phone", message: "Informe um número de WhatsApp válido." };
+  }
+
+  if (!contactServiceOptions.includes(formData.service as (typeof contactServiceOptions)[number])) {
+    return { field: "service", message: "Selecione um serviço de interesse válido." };
+  }
+
+  if (!formData.message.trim() || formData.message.trim().length < 10 || formData.message.trim().length > 2000) {
+    return { field: "message", message: "Descreva sua necessidade com mais detalhes." };
+  }
+
+  return null;
+}
 
 export function ContactSection() {
   const [formData, setFormData] = useState<ContactFormState>(initialFormState);
   const [statusMessage, setStatusMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionReference, setSubmissionReference] = useState<string | null>(null);
+  const [submissionLinks, setSubmissionLinks] = useState<FollowUpLinks | null>(null);
 
   const updateField = (field: keyof ContactFormState, value: string) => {
     setFormData((current) => ({ ...current, [field]: value }));
   };
 
-  const handleWhatsAppSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const submitContactLead = async () => {
+    setIsSubmitting(true);
+    setStatusMessage("");
+    setSubmissionReference(null);
+    setSubmissionLinks(null);
 
-    const message = buildContactMessage(formData);
-    const whatsappUrl = buildWhatsAppUrl(trackServicesContact.commercialWhatsApp.phone, message);
+    const validationError = validateContactLead(formData);
+    if (validationError) {
+      setStatusMessage(validationError.message);
+      setIsSubmitting(false);
+      return;
+    }
 
-    setStatusMessage("Abrindo o WhatsApp com sua solicitação preenchida.");
-    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    const fallbackLinks = buildCommercialContactLinks(formData);
+
+    if (!emailJsConfig.serviceId || !emailJsConfig.templateId || !emailJsConfig.publicKey) {
+      setSubmissionLinks(fallbackLinks);
+      setStatusMessage("EmailJS não está configurado. Use os canais diretos abaixo ou informe NEXT_PUBLIC_EMAILJS_SERVICE_ID, NEXT_PUBLIC_EMAILJS_TEMPLATE_ID e NEXT_PUBLIC_EMAILJS_PUBLIC_KEY.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      await emailjs.send(
+        emailJsConfig.serviceId,
+        emailJsConfig.templateId,
+        {
+          from_name: formData.name.trim(),
+          company: formData.company.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          service: formData.service.trim(),
+          message: formData.message.trim(),
+          to_email: trackServicesContact.email,
+          reply_to: formData.email.trim(),
+          site_name: "Track Services"
+        },
+        {
+          publicKey: emailJsConfig.publicKey
+        }
+      );
+
+      const reference = crypto.randomUUID();
+      setSubmissionReference(reference);
+      setSubmissionLinks(fallbackLinks);
+      setStatusMessage(`Contato enviado com sucesso${reference ? ` • protocolo ${reference.slice(0, 8).toUpperCase()}` : ""}.`);
+      setFormData(initialFormState);
+
+      return;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Não conseguimos registrar seu contato agora.";
+      setStatusMessage(`${message} Você ainda pode continuar pelos canais diretos.`);
+      setSubmissionLinks(fallbackLinks);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleEmailFallback = () => {
-    const subject = `Novo contato do site - ${formData.company || formData.name || "Track Services"}`;
-    const body = buildContactMessage(formData);
+  const handleWhatsAppSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-    setStatusMessage("Abrindo o seu cliente de e-mail com a solicitação preenchida.");
-    window.location.href = buildMailtoUrl(subject, body);
+    await submitContactLead();
+  };
+
+  const handleEmailFallback = async () => {
+    const fallbackLinks = buildCommercialContactLinks(formData);
+
+    setSubmissionLinks(fallbackLinks);
+    setStatusMessage("Abrindo o e-mail com os dados preenchidos.");
+    window.location.href = fallbackLinks.emailUrl;
   };
 
   return (
@@ -110,6 +204,16 @@ export function ContactSection() {
           </div>
 
           <form className="fd space-y-4" onSubmit={handleWhatsAppSubmit}>
+            <input
+              className="hidden"
+              type="text"
+              name="website"
+              value={formData.website}
+              onChange={(event) => updateField("website", event.target.value)}
+              autoComplete="off"
+              tabIndex={-1}
+              aria-hidden="true"
+            />
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block text-sm font-semibold text-slate-700">
                 Nome
@@ -169,7 +273,7 @@ export function ContactSection() {
                 <option value="" disabled>
                   Selecione uma opção
                 </option>
-                {serviceOptions.map((option) => (
+                {contactServiceOptions.map((option) => (
                   <option key={option} value={option}>
                     {option}
                   </option>
@@ -188,13 +292,38 @@ export function ContactSection() {
             </label>
 
             <div className="flex flex-col gap-3 sm:flex-row">
-              <button type="submit" className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded bg-[#E8621A] px-6 text-sm font-bold uppercase tracking-[0.05em] text-white shadow-md transition hover:-translate-y-0.5 hover:bg-[#C04E10]">
-                Enviar por WhatsApp
+              <button type="submit" disabled={isSubmitting} className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded bg-[#E8621A] px-6 text-sm font-bold uppercase tracking-[0.05em] text-white shadow-md transition hover:-translate-y-0.5 hover:bg-[#C04E10] disabled:cursor-not-allowed disabled:opacity-70">
+                {isSubmitting ? "Enviando..." : "Enviar contato"}
               </button>
-              <button type="button" onClick={handleEmailFallback} className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded border border-slate-300 bg-white px-6 text-sm font-bold uppercase tracking-[0.05em] text-slate-700 transition hover:border-[#E8621A] hover:text-[#E8621A]">
-                Enviar por e-mail
+              <button type="button" disabled={isSubmitting} onClick={handleEmailFallback} className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded border border-slate-300 bg-white px-6 text-sm font-bold uppercase tracking-[0.05em] text-slate-700 transition hover:border-[#E8621A] hover:text-[#E8621A] disabled:cursor-not-allowed disabled:opacity-70">
+                Abrir e-mail manualmente
               </button>
             </div>
+
+            {submissionLinks ? (
+              <div className="rounded border border-emerald-200 bg-emerald-50 p-4 text-emerald-950">
+                <div className="text-sm font-bold uppercase tracking-[0.08em] text-emerald-700">Contato registrado</div>
+                <p className="mt-2 text-sm leading-7 text-emerald-800">
+                  {submissionReference ? `Protocolo ${submissionReference.slice(0, 8).toUpperCase()}. ` : ""}Escolha o próximo canal para continuar a conversa comercial.
+                </p>
+                <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                  <a
+                    href={submissionLinks.whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-[46px] items-center justify-center rounded bg-emerald-600 px-5 text-sm font-bold uppercase tracking-[0.05em] text-white transition hover:bg-emerald-700"
+                  >
+                    Continuar no WhatsApp
+                  </a>
+                  <a
+                    href={submissionLinks.emailUrl}
+                    className="inline-flex min-h-[46px] items-center justify-center rounded border border-emerald-300 bg-white px-5 text-sm font-bold uppercase tracking-[0.05em] text-emerald-800 transition hover:border-emerald-400 hover:text-emerald-950"
+                  >
+                    Abrir e-mail
+                  </a>
+                </div>
+              </div>
+            ) : null}
 
             <p className="min-h-5 text-sm text-slate-500" aria-live="polite" role="status">
               {statusMessage}

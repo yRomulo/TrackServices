@@ -1,0 +1,66 @@
+TRACK SERVICES BACKEND - RESUMO ATUAL
+Data: 2026-04-02
+
+1. Visao geral
+- Foi criada a fundacao do backend em .NET 10 com arquitetura modular: Api, Application, Domain e Infrastructure.
+- A API foi iniciada com overview em / e /api, health check em /health e informacoes de versao em /api/v1/info.
+- O fluxo comercial do front-end segue separado e o backend agora suporta a evolucao do portal.
+
+2. Persistencia
+- A camada de persistencia foi criada com EF Core 10.
+- Foram modeladas as entidades Tenant, ContactLead e PortalTicket.
+- Foi criado o DbContext TrackServicesDbContext com auditoria automatica para CreatedAt e UpdatedAt.
+- Foram adicionados mapeamentos, indices, relacoes e uma factory de design-time para migrations.
+- A migration inicial InitialCreate foi gerada em apps/backend/src/TrackServices.Infrastructure/Persistence/Migrations.
+- No workspace atual, o desenvolvimento usa Persistence:Provider=InMemory porque o LocalDB nao esta disponivel neste ambiente.
+- O caminho com SQL Server continua configurado para uso local real ou Azure SQL.
+
+3. Primeiros recursos de dominio
+- Foi criada a area persistida da API para contact leads com POST /api/v1/contact-leads.
+- Foi criada a primeira area persistida da API para tenants.
+- Endpoints disponiveis em /api/v1/contact-leads:
+  - POST /api/v1/contact-leads
+- Endpoints disponiveis em /api/v1/tenants:
+  - GET /api/v1/tenants
+  - GET /api/v1/tenants/{id}
+  - POST /api/v1/tenants
+- O contrato da API foi atualizado para refletir esses endpoints.
+
+4. Swagger
+- Swagger e Swagger UI foram configurados na API.
+- Em ambiente Development, a interface fica disponivel em /swagger.
+
+5. Validacoes executadas
+- Build da solution do backend validado com sucesso.
+- Health check validado com sucesso.
+- /api/v1/info validado com sucesso.
+- POST /api/v1/contact-leads validado com sucesso.
+- POST /api/v1/contact-leads com TenantId inexistente retornou validation problem como esperado.
+- Lista de tenants validada com sucesso.
+- Criacao de tenant validada com sucesso.
+- Consulta de tenant por id validada com sucesso.
+
+6. Comandos executados
+- dotnet tool install --global dotnet-ef --version 10.0.0
+- dotnet-ef migrations add InitialCreate --project apps/backend/src/TrackServices.Infrastructure/TrackServices.Infrastructure.csproj --startup-project apps/backend/src/TrackServices.Infrastructure/TrackServices.Infrastructure.csproj --output-dir Persistence/Migrations
+- dotnet-ef database update --project apps/backend/src/TrackServices.Infrastructure/TrackServices.Infrastructure.csproj --startup-project apps/backend/src/TrackServices.Infrastructure/TrackServices.Infrastructure.csproj
+- dotnet add apps/backend/src/TrackServices.Api/TrackServices.Api.csproj package Swashbuckle.AspNetCore
+- npm run build:backend
+- npm run dev:backend
+- curl.exe -k -s https://localhost:7080/health
+- curl.exe -k -s https://localhost:7080/api/v1/info
+- curl.exe -k -i -X POST -H "Content-Type: application/json" --data-binary @contact-lead-payload.json https://localhost:7080/api/v1/contact-leads
+- curl.exe -k -i -X POST -H "Content-Type: application/json" --data-binary @invalid-contact-lead-payload.json https://localhost:7080/api/v1/contact-leads
+- curl.exe -k -s https://localhost:7080/api/v1/tenants
+- curl.exe -k -i -X POST -H "Content-Type: application/json" --data-binary @<arquivo temporario> https://localhost:7080/api/v1/tenants
+- curl.exe -k -s https://localhost:7080/api/v1/tenants/{id}
+
+7. Atualizacao recente
+- O endpoint POST /api/v1/contact-leads foi implementado com validacao, persistencia e resposta 201 Created.
+- O /api/v1/info agora expõe o novo endpoint no inventario da API.
+- O POST de teste registrou um lead em memoria no workspace com sucesso.
+- O /health permaneceu saudavel apos a alteracao.
+
+8. Observacao do ambiente
+- A tentativa de aplicar a migration no banco local falhou porque o runtime do LocalDB nao esta instalado neste workspace.
+- A solucao adotada foi manter SQL Server pronto para o ambiente real e usar InMemory apenas para desenvolvimento local neste workspace.

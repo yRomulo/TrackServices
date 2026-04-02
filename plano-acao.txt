@@ -1,0 +1,346 @@
+﻿TRACK SERVICES
+Soluções em Tecnologia da Informação
+PLANO DE AÇÃO — PORTAL CORPORATIVO
+Desenvolvimento do Site Institucional e Portal de Clientes
+	
+
+
+
+Versão
+1.0
+	Data
+2025
+	Status
+Em planejamento
+	
+
+
+
+VAMOS SEGUIR O EXEWMPLO DO SITE ABAIXO:
+
+
+https://www.landesigners.com.br/
+
+
+vamos retirar o link de clientes e seja instalador do site 
+os textos utilizados, podem ser os mesmos do site atual
+
+
+Vamos incluir o trabalhe conosco
+Incluir Cases de sucesso
+
+
+fazer um comparativo de serviços entre o site atual e o da landesigners, para reformulamos os links de serviços oferecidos. Ex. Serviço de gestão e governança dentro do seu link respectivo, projetos separados.
+
+
+Fotos de projetos que precisamos incluir:
+
+Projeto do Porto do Açu
+Projeto Petrobras
+Projeto embarque Perenco - Recertificação de cabos
+Montagem de sala de cinema
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. Resumo Executivo
+
+
+Este documento apresenta o plano de ação para o desenvolvimento do novo portal corporativo da Track Services.
+
+
+O projeto contempla duas entregas principais:
+
+
+Site Institucional Público
+Vitrine corporativa com SEO e apresentacao de servicos
+	Portal de Clientes (B2B)
+Área autenticada para empresas parceiras acompanharem chamados, relatórios de SLA, status de projetos e dashboards gerenciais.
+	
+
+________________
+
+
+2. Stack Tecnológico 
+
+
+2.1  Front-end
+Tecnologia
+	Função
+	Justificativa
+	Next.js (React)
+	SSR para SEO do site público + SPA para o portal autenticado
+	SEO nativo, deploy simples no Vercel, componentização React
+	Tan Stack Query
+	Cache e sincronização de dados da API
+	Essencial para dashboards com alto volume de dados
+	Tailwind CSS
+	Estilização utilitária responsiva
+	Velocidade de desenvolvimento e consistência visual
+	Vercel
+	Hospedagem e CDN global do front-end
+	Deploy continuo via Git, CDN automatica, HTTPS nativo
+	
+
+2.2  Back-end
+Tecnologia
+	Função
+	Justificativa
+	C# / .NET 8
+	API RESTful, regras de negócio, serviços de domínio
+	Maturidade, performance e ecossistema Microsoft Azure
+	Azure App Service
+	Hospedagem dos serviços .NET
+	Auto-scaling, integração nativa com demais serviços Azure
+	Azure API Management
+	Gateway — roteamento, auth, rate limit por tenant
+	Controle centralizado, logs de auditoria, throttling
+	Azure SQL
+	Banco relacional principal — multi-tenancy
+	Row-Level Security por tenant_id, backups automaticos
+	Redis Cache
+	Cache de relatórios, sessões e status de processos
+	Redução drástica de carga no BD em alto volume de acesso
+	Azure Service Bus
+	Filas assíncronas — relatórios pesados e notificações
+	Desacopla processamento lento da request HTTP
+	Azure AD B2C
+	Autenticação das empresas parceiras no portal
+	MFA, gestão de usuários, auditoria — sem código próprio
+	
+
+________________
+
+
+3. Fases de Desenvolvimento
+
+
+O projeto é dividido em 4 fases sequenciais, priorizando entregas de valor incremental. Cada fase resulta em um produto funcional e testável.
+
+
+FASE 1  —  Fundação e Site Institucional   ·   Estimativa: 3-4 semanas
+Entrega: Site público no ar com todas as sessões, SEO configurado, formulário de contato funcional e deploy no Vercel.
+	
+
+Front-end
+* Converter o HTML estático atual para projeto Next.js com estrutura de páginas e componentes
+* Implementar design system com Tailwind CSS e variáveis de tema claro/escuro
+* Desenvolver componentes reutilizáveis: Navbar, Hero, ServiceCard, Testimonial, Footer
+* Configure SEO: meta tags, Open Graph, sitemap.xml, robots.txt
+* Integrar formulário de contato com envio de e-mail (API Route Next.js + SendGrid ou Resend)
+* Deploy automático na Veracel com CI/CD via GitHub
+
+
+Back-end
+* Criar repositório Git e estrutura do projeto .NET 8 (Modular Monolith)
+* Configurar pipeline CI/CD no Azure DevOps ou GitHub Actions
+* Provisionar recursos Azure: App Service, SQL, Storage Account
+* Implementar endpoint de contato (POST /contact) com validação e envio de e-mail
+
+
+________________
+
+
+FASE 2  —  Autenticação e Portal Base   ·   Estimativa: 3-5 semanas
+Entrega: Empresas parceiras conseguem fazer login, ver seus dados básicos e abrir chamados no portal.
+	
+
+Autenticação
+* Configurar Azure AD B2C: tenant, fluxos de login/logout, políticas de senha e MFA
+* Integrar MSAL (Microsoft Authentication Library) no front-end Next.js
+* Implementar RBAC: roles de Admin, Gerente e Operador por empresa
+* Criar middleware de autenticação no .NET para validar JWT do Azure AD B2C
+* Implementar refresh token rotation e expiração de sessão
+
+
+Portal — Front-end
+* Criar layout do portal com sidebar de navegação e header com perfil do usuário
+* Desenvolver página de Dashboard com métricas resumidas (chamados abertos, SLA, projetos)
+* Implementar página de abertura de chamados com formulário e upload de anexos
+* Criar listagem de chamados com filtros por status, data e prioridade
+
+
+API — Back-end
+* Criar modulo AuthService: gestão de usuários por tenant, vinculação com Azure AD B2C
+* Criar módulo Ticket Service: CRUD de chamados, atribuição, mudança de status, comentários
+* Configurar Azure API Management como gateway com rate limit por tenant_id
+* Implementar Row-Level Security no Azure SQL para isolamento de dados por empresa
+
+
+________________
+
+
+FASE 3  —  Relatórios, Dashboards e Integrações   ·   Estimativa: 4-6 semanas
+Entrega: Portal completo com dashboards gerenciais, relatórios de SLA, status de projetos e integração com APIs externas.
+	
+
+Relatórios e Dashboards
+* Criar módulo Report Service: geracao de relatorios por tenant com filtros de período
+* Implementar cache de relatórios no Redis com TTL configurável (evitar sobrecarga no BD)
+* Desenvolver fila de processamento assíncrono no Azure Service Bus para relatórios pesados
+* Criar dashboard interativo no front-end com gráficos de chamados, SLA e uptime
+* Implementar exportação de relatórios em PDF e Excel
+
+
+Integração com APIs Externas
+* Criar módulo Integration Service para consumo e normalização de APIs de terceiros:
+* Ferramentas de monitoramento: Datado, Grafana, Azure Monitor
+* Sistemas de chamados dos clientes: Jira, ServiceNow, Zendesk
+* Pipelines de desenvolvimento: Azure DevOps, GitHub
+* Implementar cache dos dados externos no Redis com TTL de 5 minutos
+* Criar sistema de fallback para quando APIs externas estiverem indisponíveis
+* Armazenar credenciais de APIs externas no Azure Key Vault — nunca expostas no front-end
+
+
+Notificações
+* Notificações por e-mail ao atualizar status de chamados (Azure Communication Services)
+* Criar notificações push no navegador via Web Push API
+* Configurar alertas de SLA próximo do vencimento
+
+
+________________
+
+
+FASE 4  —  Qualidade, Segurança e Lançamento   ·   Estimativa: 2-3 semanas
+Entrega: Sistema em produção com monitoramento ativo, testes aprovados e documentação completa.
+	
+
+Segurança
+* Auditoria de segurança: revisão de OWASP Top 10 (SQL injection, XSS, CSRF, IDOR)
+* Implementar logs de auditoria para todas as ações do portal (quem acessou o quê e quando)
+* Configurar Content Security Policy (CSP) e headers de seguranca HTTP
+* Teste de penetração básico antes do lançamento
+* Validar conformidade com LGPD: política de privacidade, consentimento e tratamento de dados
+
+
+Performance e Qualidade
+* Testes de carga simulando alto volume de acessos simultâneos por tenant
+* Otimização de queries no Azure SQL — índices e plano de execução
+* Configurar Azure Monitor + Application Insights para observabilidade em produção
+* Testes automatizados: unitários.NET xUnit) e de integracao (Playwright para front-end)
+* Configurar alertas de erro e latência no Azure Monitor
+
+
+Lançamento
+* Configurar domínio e certificado SSL no Vercel (front-end) e Azure (back-end)
+* Migração de dados históricos para o novo sistema
+* Treinamento da equipe interna para uso e gestão do portal
+* Documentação técnica da API (Swagger/OpenAPI) e manual do usuário
+* Monitoramento intensivo nas primeiras 2 semanas após o lançamento
+________________
+
+
+4. Cronograma Resumido
+
+
+Estimativa total: 12 a 18 semanas, dependendo do tamanho da equipe e complexidade das integrações externas.
+
+
+#
+	Fase
+	Duração
+	Status
+	Fase 1
+	Fundação e Site Institucional
+	3-4 semanas
+	A iniciar
+	Fase 2
+	Autenticação e Portal Base
+	3-5 semanas
+	Aguarda fase 1
+	Fase 3
+	Relatórios, Dashboards e Integrações
+	4-6 semanas
+	Aguarda fase 2
+	Fase 4
+	Qualidade, Segurança e Lançamento
+	2-3 semanas
+	Aguarda fase 3
+	TOTAL
+	Projeto completo
+	12 a 18 semanas
+	—
+	
+
+________________
+
+
+5. Riscos e Mitigações
+
+
+Risco
+	Impacto
+	Mitigação
+	APIs externas de clientes indisponíveis ou sem documentação
+	Médio
+	Módulo de integração com fallback gracioso; iniciar somente com dados internos
+	Alto volume de acessos simultâneos degradando performance
+	Alto
+	Redis obrigatório desde a Fase 2; testes de carga na Fase 4; auto-scaling no Azure
+	Vazamento de dados de um tenant para outro
+	Crítico
+	Row-Level Security no Azure SQL desde a Fase 1; auditoria de IDOR antes do lançamento
+	Escopo crescendo sem controle (scope creep)
+	Médio
+	Congelar escopo de cada fase antes de iniciar a próxima; novas features em iteração futura
+	Dependência de único desenvolvedor em uma frente
+	Médio
+	Documento continua do código; revisões em par desde a Fase 1
+	
+
+
+
+6. Próximas Ações Imediatas
+
+
+Ações concretas para iniciar o projeto ainda esta semana:
+
+
+#
+	Ação
+	Responsável
+	Prazo
+	1
+	Criar repositório GitHub/Azure DevOps com estrutura de monorepo (front + back)
+	Dev Full-stack
+	Dia 1-2
+	2
+	Inicializar projeto Next.js e estruturar os componentes React
+	Dev Front-end
+	Dia 2-5
+	3
+	Criar projeto .NET 8 com estrutura modular e conectar ao Azure SQL (ambiente dev)
+	Dev Back-end
+	Dia 2-5
+	4
+	Provisionar recursos Azure: App Service, SQL, Redis, API Management (ambiente dev)
+	Dev / DevOps
+	Dia 3-5
+	5
+	Configurar pipeline CI/CD: push no main faz deploy automático Vercel (front) e Azure (back)
+	Dev / DevOps
+	Semana 1
+	6
+	Definir contrato da API: endpoints, formato de resposta e versionamento (v1/...)
+	Tech Lead
+	Semana 1
+	7
+	Levantamento das empresas parceiras existentes para modelar o multi-tenancy no banco
+	PO / Negócio
+	Semana 1
+	8
+	Mapear APIs externas prioritárias dos clientes a integrar (Fase 3) e solicitar credenciais
+	PO / Clientes
+	Semana 2
